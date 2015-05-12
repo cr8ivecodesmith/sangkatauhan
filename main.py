@@ -34,12 +34,13 @@ def process_encounters(encounters, humans, world_age):
         mother.mothered = settings.HUMAN_FEMALE_MOTHERHOOD
         humans.add(child)
 
-        print('[{:%Y-%m-%d %H:%M:%S}] {} eloped {} and gave birth to {}!'.format(
+        msg = '[{:%Y-%m-%d %H:%M:%S}] {} eloped {} and gave birth to {}!'.format(
             datetime.now(),
             father,
             mother,
             child
-        ))
+        )
+        print(msg)
 
     return (humans, dead_humans)
 
@@ -54,16 +55,7 @@ def main():
     dead_humans = set()
     human_encounters = set()
     start_time = datetime.now()
-    world_start_time = start_time
-
-    msg = '[{:%Y-%m-%d %H:%M:%S}] world age: {} living: {} dead: {} encounters: {}'.format(
-        datetime.now(),
-        world_age,
-        len(living_humans),
-        len(dead_humans),
-        len(human_encounters)
-    )
-    print(msg)
+    game_start_time = start_time
 
     # Begin game loop
     while world_age <= settings.WORLD_MAX_AGE or living_humans:
@@ -123,13 +115,24 @@ def main():
             world_age += 1
             human_encounters.clear()
 
+    game_end_time = datetime.now()
 
     if not living_humans and world_age < settings.WORLD_MAX_AGE:
         print('Human beings have died out before the world perished!')
     if living_humans and world_age >= settings.WORLD_MAX_AGE:
         print('The world has perished and human beings will soon die!')
 
-    print('End.')
+    print('There were {} humans who have ever lived. {} male and {} female.'.format(
+        len(living_humans | dead_humans),
+        len([i for i in iter(living_humans | dead_humans) if i.sex == 'M']),
+        len([i for i in iter(living_humans | dead_humans) if i.sex == 'F']),
+    ))
+
+    print('The world collapsed and the humans perished in {:%H:%M:%S} hours.'.format(
+        game_end_time - game_start_time
+    ))
+
+    print('Fin.')
 
 
 if __name__ == '__main__':
