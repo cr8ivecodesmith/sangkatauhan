@@ -2,6 +2,7 @@
 Sangkatauhan
 
 """
+import pdb
 import random
 from datetime import datetime, timedelta
 
@@ -13,8 +14,17 @@ def process_encounters(encounters, humans, world_age):
     dead_humans = set()
     for enc in iter(encounters):
         p1, p2 = enc
+        msg = '[{:%Y-%m-%d %H:%M:%S}|{}] {} encountered {} on position {}.'.format(
+            datetime.now(),
+            world_age,
+            p1,
+            p2,
+            p1.position
+        )
 
-        if (p1.sex == p2.sex) or p1.spouse != p2 or p2.spouse != p1:
+        if (p1.sex == p2.sex) or (
+            (p1.spouse and p1.spouse != p2) or (p2.spouse and p2.spouse != p1)
+        ):
             # TODO: Either humans will fight, hunt food, or just be passive
             continue
 
@@ -34,8 +44,9 @@ def process_encounters(encounters, humans, world_age):
         mother.mothered = settings.HUMAN_FEMALE_MOTHERHOOD
         humans.add(child)
 
-        msg = '[{:%Y-%m-%d %H:%M:%S}] {} eloped {} and gave birth to {}!'.format(
+        msg = '[{:%Y-%m-%d %H:%M:%S}|{}] {} eloped {} and gave birth to {}.'.format(
             datetime.now(),
+            world_age,
             father,
             mother,
             child
@@ -73,8 +84,9 @@ def main():
         # Move
         for human in iter(living_humans):
             human.move()
-            msg = '[{:%Y-%m-%d %H:%M:%S}] {} moved to {}'.format(
+            msg = '[{:%Y-%m-%d %H:%M:%S}|{}] {} moved to position {}'.format(
                 datetime.now(),
+                world_age,
                 human,
                 human.position
             )
@@ -101,7 +113,7 @@ def main():
                     human.spouse = None
 
             # Log EOD stats
-            msg = '[{:%Y-%m-%d %H:%M:%S}] world age: {} living: {} dead: {} encounters: {}'.format(
+            msg = '[{:%Y-%m-%d %H:%M:%S}|{}] living: {} dead: {} encounters: {}'.format(
                 datetime.now(),
                 world_age,
                 len(living_humans),
@@ -137,3 +149,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    pdb.set_trace()
